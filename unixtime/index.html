@@ -53,7 +53,7 @@
       <div class="wrapper">
         <div class="pane left">
           <h1>UnixTimeを入力</h1>
-          <textarea v-model="left" @input="onInputLeft"></textarea>
+          <textarea v-model="left" @input="onInputLeft" @keyup="onMoveLeft"></textarea>
         </div>
         <div class="pane right">
           <h1>日付を入力</h1>
@@ -70,7 +70,6 @@
       import { format, parse } from "https://esm.run/date-fns";
 
       const unixToHuman = (timeStr) => {
-        console.log("t", timeStr);
         if (timeStr.match(/\d+/)) {
           return format(new Date(+timeStr), "yyyy-MM-dd HH:mm:ss");
         }
@@ -90,6 +89,7 @@
           return {
             left: now,
             right: unix,
+            leftInput: ""
           };
         },
         methods: {
@@ -102,6 +102,13 @@
           onInputRight(ev) {
             this.left = ev.target.value.split("\n").map(humanToUnix).join("\n");
           },
+          onMoveLeft(ev) {
+            const textarea = ev.target
+            const lineNo = textarea.value.substr(0, textarea.selectionStart).split("\n").length - 1
+            const currentLine = textarea.value.split("\n")[lineNo]
+            this.leftInput = new Date(+currentLine).toISOString()
+            //TODO
+          }
         },
       });
     </script>
