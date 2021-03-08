@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unixtime → 日時</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        margin: 0;
+      }
+      #app {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+      .header {
+        background: black;
+        color: white;
+        padding: 0.5em;
+      }
+
+      h1 {
+        margin: 0 0 0.5em 0;
+      }
+      .wrapper {
+        margin: 1rem;
+        display: flex;
+        flex: 1;
+      }
+      .pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      textarea {
+        flex: 1;
+        font-size: 2rem;
+      }
+      .header a{
+          color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="header"><a href="../">時間くん</a> / Unixtime ←→日時変換</div>
+      <div class="wrapper">
+        <div class="pane left">
+          <h1>UnixTimeを入力</h1>
+          <textarea v-model="left" @input="onInputLeft"></textarea>
+        </div>
+        <div class="pane right">
+          <h1>日付を入力</h1>
+          <textarea v-model="right" @input="onInputRight"></textarea>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.9/vue.js"
+      integrity="sha512-o9SZrtqlGkpa7EF+dDrNjEdRFFYhymlrBzDKpolHNolxsyx0IcXAbEm9i1e8QpoiMgEdKZVtY8XiK1t8i6jVDA=="
+      crossorigin="anonymous"
+    ></script>
+    <script type="module">
+      import { format, parse } from "https://esm.run/date-fns";
+
+      const unixToHuman = (timeStr) => {
+        console.log("t", timeStr);
+        if (timeStr.match(/\d+/)) {
+          return format(new Date(+timeStr), "yyyy-MM-dd HH:mm:ss");
+        }
+        return "";
+      };
+      const humanToUnix = (timeStr) => {
+        if (timeStr.match(/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/))
+          return parse(timeStr, "yyyy-MM-dd HH:mm:ss", new Date()).getTime();
+      };
+
+      const now = new Date().getTime();
+      const unix = unixToHuman(now.toString());
+
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            left: now,
+            right: unix,
+          };
+        },
+        methods: {
+          onInputLeft(ev) {
+            this.right = ev.target.value
+              .split("\n")
+              .map(unixToHuman)
+              .join("\n");
+          },
+          onInputRight(ev) {
+            this.left = ev.target.value.split("\n").map(humanToUnix).join("\n");
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
