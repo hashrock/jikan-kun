@@ -1,105 +1,168 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>時間くん / マルチタイマー</title>
+    <style>
+      .header {
+        background: black;
+        color: white;
+        padding: 0.5em;
+      }
+      .header a {
+        color: white;
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>時間くん / マルチタイマー</title>
-  <style>
-    .header{
-      background:black;
-      color: white;
-      padding: 0.5em;
-    }
-    .header a {
-      color: white;
-    }
+      #app {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      body,
+      html {
+        height: 100%;
+      }
 
-    #app {
-      flex: 1;
-      display:flex;
-      flex-direction: column;
-    }
-    body, html {
-      height: 100%;
-    }
-    
-    body {
-      display: flex;
-      margin: 0;
-    }
+      body {
+        display: flex;
+        margin: 0;
+      }
 
-    textarea {
-      font-size: 2rem;
-    }
-    .wrapper {
-      flex: 1;
-      max-width: 600px;
-      margin: 0 auto;
-      
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .sample-wrapper {
-      font-size: 0.8rem;
-      background-color: black;
-      color: white;
-      text-align: right;
-    }
-    .sample{
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .sample:hover{
-      color: rgb(208, 158, 255)
-    }
-    button{
-      padding: 0.5em;
-    }
-    .rest{
-      font-size: 5rem;
-      text-align: center;
-    }
-  </style>
-</head>
+      textarea {
+        font-size: 2rem;
+        flex: 1;
+      }
+      .wrapper {
+        flex: 1;
+        width: 600px;
+        margin: 0 auto;
 
-<body>
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .sample-wrapper {
+        font-size: 0.8rem;
+        background-color: black;
+        color: white;
+        text-align: right;
+      }
+      .sample {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .sample:hover {
+        color: rgb(208, 158, 255);
+      }
+      button {
+        padding: 0.5em;
+      }
+      .rest {
+        font-size: 5rem;
+        text-align: center;
+      }
+      .timeline{
+        text-align: center;
+      }
+      .task__item {
+        padding: 0.5em;
+        background-color: #eee;
+        border: 1px solid black;
+        border-radius: 20px;
+        display: inline-block;
+      }
+      details{
+        display: flex;
+      }
+      .pause {
+        animation: blinkAnime 0.5s infinite alternate;
+      }
+      .start{
+        color: rgb(0, 201, 50);
+      }
+      @keyframes blinkAnime{
+        0% { color: #ffc375 }
+      100% { color: #ffedd7 }
+      }
+      .nav{
+        width: 4rem;
+        height: 4rem;
+        margin: 0 0.5rem;
+      }
+      .nav__wrapper{
+        display: flex;
+        justify-content:center;
+      }
+    </style>
+  </head>
 
-  <div id="app">
-    <div class="header"><a href="../">時間くん</a> / マルチタイマー</div>
+  <body>
+    <div id="app">
+      <div class="header"><a href="../">時間くん</a> / マルチタイマー</div>
       <div class="wrapper">
-        <textarea name="" id="" cols="30" rows="10" v-model="timerSource"></textarea>
+        <div class="rest" :class="{start: timerStart, pause: timerPause}">{{timerRest | toMinute}}</div>
+        <div class="nav__wrapper">
+          <button v-show="!timerStart"  class="nav" @click="startTimer" :disabled="timerStart">
+            <svg id="i-play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M10 2 L10 30 24 16 Z" />
+          </svg>
+          </button>
+            <button v-show="timerStart" class="nav" @click="pauseTimer" :disabled="!timerStart">
+              <svg v-show="timerPause" id="i-play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M10 2 L10 30 24 16 Z" />
+            </svg>
 
-        <div class="sample-wrapper">
-          サンプル 
-          <span class="sample" @click="timerSource = '3m'">3分</span>
-          <span class="sample" @click="timerSource = '5m'">5分</span>
-          <span class="sample" @click="timerSource = '25m PomodoroEnd\n5m RestEnd'">ポモドーロタイマー</span>
-        </div>
-
-        <div class="rest">
-          {{timerRest | toMinute}}
-        </div>
-
-        <button @click="startTimer" :disabled="timerStart">タイマー開始</button>
-        <button @click="stopTimer" :disabled="!timerStart">タイマー停止</button>
-        <button @click="pauseTimer" :disabled="!timerStart">一時停止 {{timerPause}}</button>
+            <svg  v-show="!timerPause" id="i-pause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M23 2 L23 30 M9 2 L9 30" />
+            </svg>
+          </button>
+          <button class="nav" @click="stopTimer" :disabled="!timerStart">
+              <svg id="i-trash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M28 6 L6 6 8 30 24 30 26 6 4 6 M16 12 L16 24 M21 12 L20 24 M11 12 L12 24 M12 6 L13 2 19 2 20 6" />
+          </svg>
+        </button>
   
-        <div style="background: white;">
-          <div v-for="(timer, i) in timers">
-            {{timer.time | toMinute}}（{{timer.title}}）
-            <span v-if="i === 0" style="color: green;">実行中</span>
+        </div>
+
+        <div style="background: white; margin: 1em 0;">
+          <div class="timeline" v-for="(timer, i) in timers">
+            <div class="task__item" :style="{backgroundColor: i === 0 && timerStart ? 'rgb(125, 255, 125)': 'white'}">
+              {{timer.time | toMinute}}（{{timer.title}}）
+              <span v-if="i === 0 && timerStart" style="color: green">実行中</span>
+            </div>
+            <div v-if="i < timers.length - 1" style="background:black; width: 1px; height: 20px; margin: 0 auto;"></div>
           </div>
         </div>
+
+        <details close>
+          <summary>タイマー編集</summary>
+
+          <div style="display: flex; flex-direction: column; min-height: 200px;">
+            <textarea
+            v-model="timerSource"
+          ></textarea>
   
+          <div class="sample-wrapper">
+            サンプル
+            <span class="sample" @click="timerSource = '3m'">3分</span>
+            <span class="sample" @click="timerSource = '5m'">5分</span>
+            <span
+              class="sample"
+              @click="timerSource = '25m ポモドーロ\n5m 休憩'"
+              >ポモドーロタイマー</span
+            >
+          </div>
+  
+          </div>
       </div>
+        </details>
 
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="./index.js"></script>
-</body>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="./index.js"></script>
+  </body>
 </html>

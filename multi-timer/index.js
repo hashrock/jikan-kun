@@ -6,14 +6,33 @@ new Vue({
     toMinute(v) {
       const s = v % 60
       const m = (v - s) / 60
-      return m + "m" + s + "s"
+      return m + "分" + s + "秒"
     }
   },
   computed: {
+    timers() {
+      return this.timerSource.split("\n").filter(i => i.length > 0).map(i => {
+        let s = i.split(" ")
+        const minuteMatcher = /([0-9]*)m/
+        let m = s[0].match(minuteMatcher)
+        s[0] = s[0].replace(minuteMatcher, "")
 
+        let result = 0;
+        if (m && m[1]) {
+          result += parseInt(m[1], 10) * 60
+        }
+        if (s[0]) {
+          result += parseInt(s[0])
+        }
+
+        return {
+          title: s[1] ? s[1] : i,
+          time: result,
+        }
+      })
+    }
   },
   methods: {
-
     tick() {
       this.timerRest--;
       if (this.timerRest === 0) {
@@ -42,25 +61,6 @@ new Vue({
         return;
       }
 
-      this.timers = this.timerSource.split("\n").filter(i => i.length > 0).map(i => {
-        let s = i.split(" ")
-        const minuteMatcher = /([0-9]*)m/
-        let m = s[0].match(minuteMatcher)
-        s[0] = s[0].replace(minuteMatcher, "")
-
-        let result = 0;
-        if (m && m[1]) {
-          result += parseInt(m[1], 10) * 60
-        }
-        if (s[0]) {
-          result += parseInt(s[0])
-        }
-
-        return {
-          title: s[1] ? s[1] : i,
-          time: result,
-        }
-      })
 
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
@@ -75,13 +75,14 @@ new Vue({
     },
     stopTimer() {
       this.timerStart = false;
+      this.timerPause = false;
       clearInterval(timer)
+      this.timerRest = this.timers[0].time
     },
   },
   data: {
     timerSource: "",
     timerStart: false,
-    timers: [],
     timerRest: 0,
     timerPause: false,
   },
