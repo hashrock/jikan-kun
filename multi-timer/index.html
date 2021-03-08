@@ -69,9 +69,13 @@
       .task__item {
         padding: 0.5em;
         background-color: #eee;
-        border: 1px solid black;
+        border: 1px solid #ddd;
         border-radius: 20px;
         display: inline-block;
+      }
+      .task__item.current{
+        border: 2px solid black;
+        background: white;
       }
       details{
         display: flex;
@@ -128,7 +132,9 @@
 
         <div style="background: white; margin: 1em 0;">
           <div class="timeline" v-for="(timer, i) in timers">
-            <div class="task__item" :style="{backgroundColor: i === 0 && timerStart ? 'rgb(125, 255, 125)': 'white'}">
+            <div class="task__item" :class="{current: i === 0 && timerStart}">
+              <span style="display: inline-block; width: 2em; line-height: 2em; border-radius: 2em; background-color: rgb(107, 107, 107); color: white;">{{i + 1}}</span>
+
               {{timer.time | toMinute}}（{{timer.title}}）
               <span v-if="i === 0 && timerStart" style="color: green">実行中</span>
             </div>
