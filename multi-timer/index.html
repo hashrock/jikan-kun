@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>時間くん / マルチタイマー</title>
+  <style>
+    .header{
+      background:black;
+      color: white;
+      padding: 0.5em;
+    }
+    .header a {
+      color: white;
+    }
+
+    #app {
+      flex: 1;
+      display:flex;
+      flex-direction: column;
+    }
+    body, html {
+      height: 100%;
+    }
+    
+    body {
+      display: flex;
+      margin: 0;
+    }
+
+    textarea {
+      font-size: 2rem;
+    }
+    .wrapper {
+      flex: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .sample-wrapper {
+      font-size: 0.8rem;
+      background-color: black;
+      color: white;
+      text-align: right;
+    }
+    .sample{
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .sample:hover{
+      color: rgb(208, 158, 255)
+    }
+    button{
+      padding: 0.5em;
+    }
+    .rest{
+      font-size: 5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <div class="header"><a href="../">時間くん</a> / マルチタイマー</div>
+      <div class="wrapper">
+        <textarea name="" id="" cols="30" rows="10" v-model="timerSource"></textarea>
+
+        <div class="sample-wrapper">
+          サンプル 
+          <span class="sample" @click="timerSource = '3m'">3分</span>
+          <span class="sample" @click="timerSource = '5m'">5分</span>
+          <span class="sample" @click="timerSource = '25m PomodoroEnd\n5m RestEnd'">ポモドーロタイマー</span>
+        </div>
+
+        <div class="rest">
+          {{timerRest | toMinute}}
+        </div>
+
+        <button @click="startTimer" :disabled="timerStart">タイマー開始</button>
+        <button @click="stopTimer" :disabled="!timerStart">タイマー停止</button>
+        <button @click="pauseTimer" :disabled="!timerStart">一時停止 {{timerPause}}</button>
+  
+        <div style="background: white;">
+          <div v-for="(timer, i) in timers">
+            {{timer.time | toMinute}}（{{timer.title}}）
+            <span v-if="i === 0" style="color: green;">実行中</span>
+          </div>
+        </div>
+  
+      </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="./index.js"></script>
+</body>
+
+</html>
